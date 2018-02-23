@@ -1,12 +1,29 @@
-﻿<Window x:Class="WpEmail.MainWindow"
+﻿<Window x:Class="WpfEmail.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WpEmail"
+        xmlns:local="clr-namespace:WpfEmail"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        
-    </Grid>
+    <DockPanel >
+        <DockPanel DockPanel.Dock="Top" >
+            <Button DockPanel.Dock="Right" Margin="2,2,2,2" Padding="20,0,20,0" Command="{Binding SendCommand}"> >> Send >> </Button>
+            <TextBox Margin="2,2,2,2" Text="{Binding CompletedText}" IsReadOnly="True"/>
+        </DockPanel>
+        <Button DockPanel.Dock="Top" Margin="2,2,2,2" Command="{Binding InsertCommand}">Type</Button>
+        <Button DockPanel.Dock="Top" Margin="2,2,2,2" Command="{Binding StoreCommand}">Store</Button>
+        <ListBox x:Name="Keyboad" HorizontalContentAlignment="Stretch" Margin="12,12,12,12" ItemsSource = "{Binding Path = Keyboard, Mode=TwoWay}" >
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <ListBoxItem>
+                        <DockPanel>
+                            <Button Command="{Binding RemoveMeCommand}" Margin="2,2,2,2" x:Name="Rem" DockPanel.Dock="Right"><TextBlock>Remove</TextBlock></Button>
+                            <Button Command="{Binding InsertMeCommand}" Margin="2,2,2,2"><TextBlock Text="{Binding Path = Caption}"/></Button>
+                        </DockPanel>
+                    </ListBoxItem>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </DockPanel>
 </Window>

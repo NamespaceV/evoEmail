@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace WpEmail.Properties
+namespace WpfEmail.Properties
 {
 
 
