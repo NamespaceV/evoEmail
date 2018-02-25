@@ -1,5 +1,6 @@
 ﻿namespace WpfEmail
 {
+    using System;
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Windows;
@@ -7,8 +8,10 @@
 
     public class EmailViewModel : INotifyPropertyChanged
     {
-        private ObservableCollection<ButtonViewModel> _keyboard;
-        public ObservableCollection<ButtonViewModel> Keyboard { get => _keyboard; set => _keyboard = value; }
+        private EmialModel _model;
+
+        private ObservableCollection<BreedViewModel> _species;
+        public ObservableCollection<BreedViewModel> Keyboard { get => _species; set => _species = value; }
 
         private string _completedText;
         public string CompletedText {
@@ -20,53 +23,54 @@
             }
         }
 
-        public ICommand StoreCommand { get; set; }
-        public ICommand InsertCommand { get; set; }
-        public ICommand SendCommand { get; set; }
+        public ICommand NewLifeCommand { get; set; }
+        public ICommand EvolveCommand { get; set; }
+        public ICommand ToGenePoolCommand { get; set; }
+        
+        public ICommand EvolutionCompleteCommand { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        System.Random _random = new System.Random();
+        public void OnMainBreedChaged(object o, EventArgs a)
+        {
+            CompletedText = _model.GetMainBreedName();
+        }
+        public void OnOtherBreedsChaged(object o, EventArgs a)
+        {
+            _species.Clear();
+            for (int i = 0; i < _model.GetBreedCount(); ++i)
+            {
+                var breed = new BreedViewModel();
+                int nr = i;
+                breed.Caption = _model.GetBreedName(nr);
+                breed.RemoveMeCommand = new SimpleCommand(_ => _model.KillBreed(nr));
+                breed.InsertMeCommand = new SimpleCommand(_ => _model.CloneBreed(nr));
+                breed.ChangeMeCommand = new SimpleCommand(_ => _model.EvolveBreed(nr));
+                _species.Add(breed);
+            }
+            SimplePropertyChanged("Keyboard");
+        }
 
         public EmailViewModel()
         {
-            Keyboard = new ObservableCollection<ButtonViewModel>();
-            SimplePropertyChanged("Keyboard");
-            CompletedText = "@";
-            StoreCommand = new SimpleCommand(x => 
-                {
-                    var buttonVM = new ButtonViewModel
-                    {
-                        Caption = CompletedText,
-                    };
-                    buttonVM.RemoveMeCommand = new SimpleCommand(y => Keyboard.Remove(buttonVM));
-                    buttonVM.InsertMeCommand = new SimpleCommand(y => CompletedText += buttonVM.Caption);
+            Keyboard = new ObservableCollection<BreedViewModel>();
 
-                    Keyboard.Add(buttonVM);
-                    CompletedText = "";
-                },
-                x => CompletedText.Length > 0
-                );
-            InsertCommand = new SimpleCommand(x => {
-                var r =_random.Next(28);
-                char nextChar = ' ';
-                if (r < 26)
-                {
-                    nextChar = (char)('a' + r);
-                }
-                else if (r < 27)
-                {
-                    nextChar = '@';
-                }
-                else if (r < 28)
-                {
-                    nextChar = '.';
-                }
-                CompletedText += nextChar;
-                }
+            _model = new EmialModel();
+            _model.OnMainBreedChaged += OnMainBreedChaged;
+            _model.OnOtherBreedsChanged += OnOtherBreedsChaged;
+
+            ToGenePoolCommand = new SimpleCommand(
+                x => _model.SaveMainBreed(),
+                x => _model.CanSaveMainBreed()
             );
-            SendCommand = new SimpleCommand(x => {
-                MessageBoxResult result = MessageBox.Show($"Is your email is:\n{CompletedText}\nIs that correct?", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Information);
+            EvolveCommand = new SimpleCommand(
+                x => _model.EvolveMainBreed(),
+                x => _model.CanEvolveMainBreed()
+            );
+            NewLifeCommand = new SimpleCommand(x => { _model.ComplicateMainBreed(); } );
+
+            EvolutionCompleteCommand = new SimpleCommand(x => {
+                MessageBoxResult result = MessageBox.Show($"Is your email is:\n{_model.GetMainBreedName()}\nIs that correct?", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Information);
                 if (result == MessageBoxResult.Yes)
                 {
                     Application.Current.Shutdown();
@@ -79,12 +83,12 @@
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
 
-
-        public class ButtonViewModel
+        public class BreedViewModel
         {
             public string Caption { get; set; }
             public ICommand RemoveMeCommand { get; set; }
             public ICommand InsertMeCommand { get; set; }
+            public ICommand ChangeMeCommand { get; set; }
         }
     }
 }
