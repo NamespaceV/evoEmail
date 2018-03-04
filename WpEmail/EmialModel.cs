@@ -102,6 +102,32 @@
             _mainBreed += _otherBreeds[i];
             OnMainBreedChaged.Invoke(this, null);
         }
+
+        public void CrossBreeds(int breed1, int breed2)
+        {
+            _otherBreeds.Add(Cross(_otherBreeds[breed1], _otherBreeds[breed2]));
+            OnOtherBreedsChanged.Invoke(this, null);
+        }
+
+        private string Cross(string breed1, string breed2)
+        {
+            var len = Math.Min(breed1.Length, breed2.Length);
+            var newBreed = "";
+            for (int i = 0; i < len; ++i)
+            {
+                newBreed += _random.Next(2) > 0 ? breed1[i] : breed2[i];
+            }
+            if (breed1.Length > breed2.Length)
+            {
+                newBreed += breed1.Substring(len);
+            }
+            else
+            {
+                newBreed += breed2.Substring(len);
+            }
+            return newBreed;
+        }
+
         public void KillBreed(int i)
         {
             _otherBreeds.RemoveAt(i);

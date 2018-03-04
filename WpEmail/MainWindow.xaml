@@ -18,8 +18,31 @@
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <ListBoxItem>
+                        <ListBoxItem.Style>
+                            <Style TargetType="{x:Type ListBoxItem}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Path=IsSelected}" Value="True">
+                                        <Setter Property="Background" Value="#FF0076EC"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ListBoxItem.Style>
                         <DockPanel>
-                            <Button Command="{Binding RemoveMeCommand}" Margin="2,2,2,2" DockPanel.Dock="Right"><TextBlock>Kill</TextBlock></Button>
+                            <Button Command="{Binding RemoveMeCommand}" Margin="20,2,2,2" DockPanel.Dock="Right"><TextBlock>Kill</TextBlock></Button>
+                            <Button Command="{Binding CrossMeCommand}" Margin="2,2,2,2" DockPanel.Dock="Right">
+                                <TextBlock>
+                                    <TextBlock.Style>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Setter Property="Text" Value="Cross"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Path=IsSelected}" Value="True">
+                                                    <Setter Property="Text" Value="Cancel cross" /> 
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Button>
                             <Button Command="{Binding ChangeMeCommand}" Margin="2,2,2,2" DockPanel.Dock="Right"><TextBlock>Evolve</TextBlock></Button>
                             <Button Command="{Binding InsertMeCommand}" Margin="2,2,2,2"><TextBlock Text="{Binding Path = Caption}"/></Button>
                         </DockPanel>
